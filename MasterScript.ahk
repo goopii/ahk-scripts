@@ -11,7 +11,8 @@ A_MenuMaskKey := "vkE8"
 #include utils/IsFullscreen.ahk
 #include utils/GetActiveMonitor.ahk
 #include utils/MouseOverTaskbar.ahk
-#include utils/SendHelpers.ahk
+#include utils/SendCase.ahk
+#include utils/SendModded.ahk
 #include utils/ToggleAutoclicker.ahk
 #include utils/RestartScript.ahk
 
@@ -25,67 +26,6 @@ is_WindowsKey_Held := false
 gui_border := Gui()
 gui_border.Opt("+AlwaysOnTop -Caption +ToolWindow E0x20")
 gui_border_on := false
-;==============================================================================
-; GUI FUNCTIONS
-;==============================================================================
-GuiBorderToggle(show, color := "") {
-    static borderWidth := 4
-    global gui_border_on
-
-    if (show) {
-        ; Get monitor dimensions
-        monitor := GetActiveMonitor()
-        if (!monitor) {
-            return
-        }
-        ; Create region string for border frame
-        region := Format("0-0 {1}-{2} {3}-{4} {5}-{6} {7}-{8} {9}-{10}",
-            monitor.w, 0, monitor.w, monitor.h, 0, monitor.h, 0, 0,
-            borderWidth, borderWidth)
-        region .= Format(" {1}-{2} {3}-{4} {5}-{6} {7}-{8}",
-            monitor.w - borderWidth, borderWidth,
-            monitor.w - borderWidth, monitor.h - borderWidth,
-            borderWidth, monitor.h - borderWidth,
-            borderWidth, borderWidth)
-
-        ; Show GUI and apply region
-        ; MsgBox("BackColor: " gui_border.BackColor " `nColor: " color)
-        if color != "" { ; If a color is provided, use it
-            gui_border.BackColor := color
-        }
-        else If gui_border.BackColor == "" { ; If no previous color exists, use white
-            gui_border.BackColor := "FFFFFF"
-        }
-        ; Otherwise keep the existing color
-        gui_border.Show(Format("x{1} y{2} w{3} h{4} NoActivate",
-            monitor.x, monitor.y, monitor.w, monitor.h))
-        WinSetRegion(region, gui_border)
-        gui_border_on := true
-        ; Monitor active window changes in a separate thread to update border
-        SetTimer(MonitorActiveWindow, -1)
-    } else {
-        gui_border.Hide()
-        gui_border_on := false
-    }
-}
-MonitorActiveWindow() {
-    static prevWin := ""
-
-    while (gui_border_on) {
-        try {
-            if activeWin := WinGetID("A") {
-                if (activeWin != prevWin) {
-                    GuiBorderToggle(true)
-                    prevWin := activeWin
-                }
-                WinWaitNotActive(activeWin)
-            }
-        } catch Error as e {
-            ; Skip this iteration if window detection fails
-            continue
-        }
-    }
-}
 ;==============================================================================
 ; SCRIPT INITIALIZATION
 ;==============================================================================
@@ -123,7 +63,7 @@ is_laptop := IsLaptop()
     ; Wait for key release
     KeyWait("LWin")
     is_WindowsKey_Held := false
-    Send ("{LWin up}")
+    Send("{LWin up}")
 }
 #HotIf is_WindowsKey_Held
 ; backtick{`} and tilde{∼}
@@ -136,29 +76,29 @@ is_laptop := IsLaptop()
     }
 }
 h::{ 
-    KeyHistory
+    KeyHistory()
 }
 z:: {
     Send("{LWin}")
 }
 ; Arrow key navigation
-*w:: SendModded("{Up}")
-*a:: SendModded("{Left}")
-*s:: SendModded("{Down}")
-*d:: SendModded("{Right}")
+*w:: SendModded("{Up}", ["all", "-win"]) log("w")
+*a:: SendModded("{Left}", ["all", "-win"]) log("a")
+*s:: SendModded("{Down}", ["all", "-win"]) log("s")
+*d:: SendModded("{Right}", ["all", "-win"]) log("d")
 ; Function keys
-*1:: SendModded("{F1}")
-*2:: SendModded("{F2}")
-*3:: SendModded("{F3}")
-*4:: SendModded("{F4}")
-*5:: SendModded("{F5}")
-*6:: SendModded("{F6}")
-*7:: SendModded("{F7}")
-*8:: SendModded("{F8}")
-*9:: SendModded("{F9}")
-*0:: SendModded("{F10}")
-*-:: SendModded("{F11}")
-*=:: SendModded("{F12}")
+*1:: SendModded("{F1}", ["all", "-win"])
+*2:: SendModded("{F2}", ["all", "-win"])
+*3:: SendModded("{F3}", ["all", "-win"])
+*4:: SendModded("{F4}", ["all", "-win"])
+*5:: SendModded("{F5}", ["all", "-win"])
+*6:: SendModded("{F6}", ["all", "-win"])
+*7:: SendModded("{F7}", ["all", "-win"])
+*8:: SendModded("{F8}", ["all", "-win"])
+*9:: SendModded("{F9}", ["all", "-win"])
+*0:: SendModded("{F10}", ["all", "-win"])
+*-:: SendModded("{F11}", ["all", "-win"])
+*=:: SendModded("{F12}", ["all", "-win"])
 ; Media controls
 \:: Send("{Media_Play_Pause}")
 MButton:: Send("{Media_Play_Pause}")
