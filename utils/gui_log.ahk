@@ -1,150 +1,142 @@
 #MaxThreadsPerHotkey 1
 #SingleInstance Force
 #Requires AutoHotkey v2.0
-;==============================================================================
-; LOGGING SYSTEM
-;==============================================================================
-; Global variables for logging
-global log_enabled := true
-global log_paused := false
-global log_gui := Gui()
-global log_buffer := ""
-global log_max_lines := 100
-global log_entries := []
-global log_display := ""
 
-; Enable or disable logging
-log_setState(state := "toggle") {
-  global log_enabled
-  if (state == "toggle") {
-    log_enabled := !log_enabled
-  }
-  else If (state == false) {
-    log_enabled := false
-  }
-  else If (state == true){
-    log_enabled := true
-  }
+class Logger {
+    static enabled := true
+    static paused := false
+    static gui := Gui()
+    static buffer := ""
+    static max_lines := 100
+    static entries := []
+    static display := ""
+
+    static SetState(state := "toggle") {
+        if (state == "toggle") {
+            this.enabled := !this.enabled
+        }
+        else if (state == false) {
+            this.enabled := false
+        }
+        else if (state == true) {
+            this.enabled := true
+        }
+    }
+
+    static Log(message) {
+        if (!this.enabled || this.paused) {
+            return
+        }
+
+        ; Initialize GUI on first use
+        if (!this.display)
+            this.display := this.Init()
+
+        ; Format the log message with timestamp
+        timestamp := FormatTime(A_Now, "HH:mm:ss")
+        log_msg := "[" timestamp "] " message
+
+        ; Add to log entries array, maintain max size
+        this.entries.Push(log_msg)
+        if (this.entries.Length > this.max_lines)
+            this.entries.RemoveAt(1)
+
+        ; Update display if not paused
+        this.UpdateDisplay(log_msg)
+
+        ; Ensure GUI is visible
+        if (!WinExist("ahk_id " this.gui.Hwnd))
+            this.gui.Show("w520 h380")
+
+        return message  ; Return message for chaining
+    }
+
+    static Init() {
+        if (!this.enabled) {
+            return
+        }
+
+        ; Configure basic GUI properties
+        this.gui.Opt("+AlwaysOnTop +Resize")
+        this.gui.Title := "Script Log"
+        this.gui.SetFont("s10", "Consolas")
+
+        ; Add control buttons in toolbar style at top
+        pause_btn := this.gui.AddButton("x10 y10 w120 h25", "Pause Logging")
+        clear_btn := this.gui.AddButton("x140 y10 w120 h25", "Clear Log")
+
+        ; Add separator line below buttons
+        this.gui.AddText("x0 y40 w520 h1 +0x10")  ; Horizontal line
+
+        ; Add log display control below toolbar
+        this.gui.AddText("x10 y45 w500 h20", "Log Output:")
+        this.display := this.gui.AddEdit("x10 y65 w500 h305 +ReadOnly +Multi +VScroll", "")
+
+        ; Set button actions
+        pause_btn.OnEvent("Click", this.TogglePause.Bind(this))
+        clear_btn.OnEvent("Click", this.Clear.Bind(this))
+
+        ; Handle window close
+        this.gui.OnEvent("Close", this.Close.Bind(this))
+
+        ; Calculate position for top right corner
+        gui_w := 400  ; GUI width
+        gui_h := 600  ; GUI height
+        screen_w := A_ScreenWidth
+        screen_h := A_ScreenHeight
+        x_pos := screen_w - gui_w - 50  ; 20px padding from right edge
+        y_pos := 50                      ; 20px padding from top edge
+        gui_pos := Format("x{} y{} w{} h{}", x_pos, y_pos, gui_w, gui_h)
+        ; Show the GUI in top right corner
+        this.gui.Show(gui_pos "NoActivate")
+
+        return this.display
+    }
+
+    static UpdateDisplay(latest_msg := "") {
+        if (!this.enabled) {
+            return
+        }
+
+        ; If paused, don't update unless it's a control message
+        if (this.paused && !InStr(latest_msg, "--- Logging"))
+            return
+
+        ; Add the current message if provided
+        if (latest_msg != "") {
+            this.gui["Edit1"].Value := this.gui["Edit1"].Value . latest_msg . "`r`n"
+
+            editCtrl := this.gui["Edit1"].Hwnd  ; Get the handle to the edit control
+            SendMessage(0x115, 7, 0, editCtrl)  ; WM_VSCROLL with SB_BOTTOM
+        }
+    }
+
+    static TogglePause(*) {
+        this.paused := !this.paused
+
+        ; Update button text
+        if (this.paused)
+            this.gui["Button1"].Text := "Resume Logging"
+        else
+            this.gui["Button1"].Text := "Pause Logging"
+
+        ; Add pause status to log
+        if (this.paused)
+            this.UpdateDisplay("--- Logging Paused ---")
+        else
+            this.UpdateDisplay("--- Logging Resumed ---")
+    }
+
+    static Clear(*) {
+        this.entries := []
+        this.gui["Edit1"].Value := ""
+    }
+
+    static Close(*) {
+        this.gui.Hide()
+    }
 }
 
-; Log a message to the log GUI
-log(message) {
-  global log_enabled, log_paused, log_display, log_entries, log_max_lines, log_gui
-  if (!log_enabled || log_paused) {
-    return
-  }
-  ; Initialize GUI on first use
-  if (!log_display)
-    log_display := log_init()
-
-  ; Format the log message with timestamp - fixed FormatTime syntax
-  timestamp := FormatTime(A_Now, "HH:mm:ss")
-  log_msg := "[" timestamp "] " message
-
-  ; Add to log entries array, maintain max size
-  log_entries.Push(log_msg)
-  if (log_entries.Length > log_max_lines)
-    log_entries.RemoveAt(1)
-
-  ; Update display if not paused
-  log_updateDisplay(log_msg)
-
-  ; Ensure GUI is visible
-  if (!WinExist("ahk_id " log_gui.Hwnd))
-    log_gui.Show("w520 h380")
-
-  return message  ; Return message for chaining
-}
-
-; Initialize the logging GUI
-log_init() {
-  global log_enabled, log_gui, log_display
-  if (!log_enabled) {
-    return
-  }
-  ; Configure basic GUI properties
-  log_gui.Opt("+AlwaysOnTop +Resize")
-  log_gui.Title := "Script Log"
-  log_gui.SetFont("s10", "Consolas")
-
-  ; Add control buttons in toolbar style at top
-  pause_btn := log_gui.AddButton("x10 y10 w120 h25", "Pause Logging")
-  clear_btn := log_gui.AddButton("x140 y10 w120 h25", "Clear Log")
-  close_btn := log_gui.AddButton("x270 y10 w120 h25", "Close")
-
-  ; Add separator line below buttons
-  log_gui.AddText("x0 y40 w520 h1 +0x10")  ; Horizontal line
-
-  ; Add log display control below toolbar
-  log_gui.AddText("x10 y45 w500 h20", "Log Output:")
-  log_display := log_gui.AddEdit("x10 y65 w500 h305 +ReadOnly +Multi +VScroll", "")
-
-  ; Set button actions
-  pause_btn.OnEvent("Click", log_togglePause)
-  clear_btn.OnEvent("Click", log_clear)
-  close_btn.OnEvent("Click", log_close)
-
-  ; Handle window close
-  log_gui.OnEvent("Close", log_close)
-
-  ; Calculate position for top right corner
-  gui_w := 200  ; GUI width
-  gui_h := 400  ; GUI height
-  screen_w := A_ScreenWidth
-  screen_h := A_ScreenHeight
-  x_pos := screen_w - gui_w - 50  ; 20px padding from right edge
-  y_pos := 50                      ; 20px padding from top edge
-
-  ; Show the GUI in top right corner
-  log_gui.Show(Format("x{} y{} w{} h{}", x_pos, y_pos, gui_w, gui_h))
-
-  return log_display
-}
-
-; Update the log display with current entries
-log_updateDisplay(latest_msg := "") {
-  global log_enabled, log_paused, log_gui
-  if (!log_enabled) {
-    return
-  }
-  ; If paused, don't update unless it's a control message
-  if (log_paused && !InStr(latest_msg, "--- Logging"))
-    return
-
-  ; Add the current message if provided
-  if (latest_msg != "") {
-    log_gui["Edit1"].Value := log_gui["Edit1"].Value . latest_msg . "`r`n"
-
-    editCtrl := log_gui["Edit1"].Hwnd  ; Get the handle to the edit control
-    SendMessage(0x115, 7, 0, editCtrl)  ; WM_VSCROLL with SB_BOTTOM
-  }
-}
-
-; Button handlers
-log_togglePause(*) {
-  global log_paused, log_gui
-  log_paused := !log_paused
-
-  ; Update button text
-  if (log_paused)
-    log_gui["Button1"].Text := "Resume Logging"
-  else
-    log_gui["Button1"].Text := "Pause Logging"
-
-  ; Add pause status to log
-  if (log_paused)
-    log_updateDisplay("--- Logging Paused ---")
-  else
-    log_updateDisplay("--- Logging Resumed ---")
-}
-
-log_clear(*) {
-  global log_entries, log_gui
-  log_entries := []
-  log_gui["Edit1"].Value := ""
-}
-
-log_close(*) {
-  global log_gui
-  log_gui.Hide()
-}
+; Create global functions for backward compatibility
+log_setState(state := "toggle") => Logger.SetState(state)
+log(message) => Logger.Log(message)
