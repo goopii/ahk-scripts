@@ -1,7 +1,6 @@
 #Requires AutoHotkey v2.0
 
-; Global variable for autoclicker state
-global autoClicker_on := false
+autoClicker_on := false
 
 ; AutoClicker function
 ToggleAutoclicker() {
@@ -14,4 +13,4 @@ ToggleAutoclicker() {
         ToolTip("AUTOCLICKER ON", A_ScreenWidth / 2, 10, 11)
     }
     autoClicker_on := !autoClicker_on
-} 
+}

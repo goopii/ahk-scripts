@@ -20,9 +20,11 @@ IsLaptop() {
     }
 
     return false
-} 
+}
 ; Get device-specific value based on system type
 GetDeviceValue(desktopValue, laptopValue) {
     global is_laptop
     return is_laptop ? laptopValue : desktopValue
 }
+
+is_laptop := IsLaptop()

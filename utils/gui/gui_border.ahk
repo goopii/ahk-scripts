@@ -1,6 +1,11 @@
 #MaxThreadsPerHotkey 1
 #SingleInstance Force
 #Requires AutoHotkey v2.0
+
+gui_border := Gui()
+gui_border.Opt("+AlwaysOnTop -Caption +ToolWindow E0x20")
+gui_border_on := false
+
 GuiBorderToggle(show, color := "") {
   static borderWidth := 4
   global gui_border_on

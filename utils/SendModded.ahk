@@ -1,69 +1,63 @@
 #Requires AutoHotkey v2.0
-
-#include ./HasValue.ahk
-; Send a key with modifiers
-; key - The key to send
-; modifiers - Array of modifier keys to include.
-; "alt", "shift", "ctrl", "win", "all"
-;Example:   
-;   "shift" (if pressed)
+#include ./GetIndexOfValue.ahk
+#include ./gui/gui_log.ahk
+; Function to send a key with modifiers with optional forced or ignored modifiers
+; key (required)     - The key to send
+; options (optional) - Array of options allowing for modifiers to be forced or ignored
+; Example:
 ;   "-shift" (ignore)
 ;   "+shift" (force)
-;   "all" (all modifiers if pressed)
-;   "+all" (force all modifiers)
-;If no modifiers provided, defaults to ["alt", "shift", "ctrl", "win"]
-SendModded(key, modifiers := []) {
-    allModifiers := ["alt", "shift", "ctrl", "win"]
-    ; Build modifier string
-    modString := ""
-    if modifiers.Length = 0 {
-        modifiers := allModifiers
-    }
-    ; Handle "all" and "+all" special cases
-    else if HasValue(modifiers, "all") or HasValue(modifiers, "+all") {
-        ; Remove any negated modifiers from allModifiers
-        for mod in modifiers {
-            if SubStr(mod, 1, 1) = "-" {
-                negatedMod := SubStr(mod, 2)
-                if HasValue(allModifiers, negatedMod)
-                    allModifiers.RemoveAt(HasValue(allModifiers, negatedMod))
+SendModded(key, options := []) {
+    modifiers := ["alt", "shift", "ctrl", "win"]
+
+    ; Handle forced or ignored modifiers
+    for mod in options {
+        prefix := SubStr(mod, 1, 1)
+        optionMod := SubStr(mod, 2)
+        index := GetIndexOfValue(modifiers, optionMod)
+        if prefix == "-" {
+            if index {
+                modifiers.RemoveAt(index)
+                ; Send("{Blind}{" optionMod " up}")
             }
         }
-        ; Replace "all" or "+all" with the filtered allModifiers
-        modifiers := allModifiers
-        if HasValue(modifiers, "+all")
-            for i, mod in modifiers
-                modifiers[i] := "+" mod
+        else if prefix == "+" {
+            ; InsertAt pushes the next element to the right
+            ; So we need to remove the element after the index
+            modifiers.InsertAt(index, mod)
+            modifiers.RemoveAt(index + 1)
+        }
     }
-
+    ; Create the modifier string
+    modString := ""
     for mod in modifiers {
-        ; Handle modifiers with prefixes
         prefix := SubStr(mod, 1, 1)
-        if prefix = "-"  ; Skip if modifier starts with minus
-            continue
-        if prefix = "+"  ; Remove plus prefix if present
+        ; Log("Modifier: " mod)
+        if prefix == "+" or prefix == "-" {
             mod := SubStr(mod, 2)
-            
+            ; Log("Modifier: " mod)
+        }
         switch mod {
             case "alt":
-                if prefix = "+" or GetKeyState("Alt", "P") {
+                if prefix == "+" or GetKeyState("Alt", "P") {
                     modString .= "!"
                 }
             case "shift":
-                if prefix = "+" or GetKeyState("Shift", "P") {
+                if prefix == "+" or GetKeyState("Shift", "P") {
                     modString .= "+"
                 }
             case "ctrl":
-                if prefix = "+" or GetKeyState("Control", "P") {
+                if prefix == "+" or GetKeyState("Control", "P") {
                     modString .= "^"
                 }
             case "win":
-                if prefix = "+" or (GetKeyState("LWin", "P") or GetKeyState("RWin", "P")) {
+                if prefix == "+" or (GetKeyState("LWin", "P") or GetKeyState("RWin", "P")) {
                     modString .= "#"
                 }
             default:
                 throw "Invalid modifier: " mod
         }
     }
+    Log("SendModded Send: " modString key)
     Send(modString key)
 }
