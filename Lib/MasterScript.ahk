@@ -22,32 +22,32 @@ A_MenuMaskKey := "vkE8"
 ; INITIALIZATION
 ;==============================================================================
 is_WindowsKey_Held := false
-LogState(true)
+LogState(false)
 ;==============================================================================
 ; MAIN
 ;==============================================================================
 *$LWin:: {
-  global is_WindowsKey_Held
-  is_WindowsKey_Held := true
-  Send("{LWin DownTemp}")
-  ; Wait for key release
-  KeyWait("LWin")
-  is_WindowsKey_Held := false
-  Send("{LWin up}")
+    global is_WindowsKey_Held
+    is_WindowsKey_Held := true
+    Send("{LWin DownTemp}")
+    ; Wait for key release
+    KeyWait("LWin")
+    is_WindowsKey_Held := false
+    Send("{LWin up}")
 }
 #HotIf is_WindowsKey_Held
 ; backtick{`} and tilde{∼}
 *Esc:: {
-  if GetKeyState("Shift", "P") { ; {`}
-    SendModded("{U+223C}", ["alt", "ctrl"])
-  }
-  else { ; {∼}
-    SendModded("{U+0060}", ["alt", "ctrl"])
-  }
+    if GetKeyState("Shift", "P") { ; {`}
+        SendModded("{U+223C}", ["alt", "ctrl"])
+    }
+    else { ; {∼}
+        SendModded("{U+0060}", ["alt", "ctrl"])
+    }
 }
 #!l:: {
-  LogState("toggle")
-  LogDisplay("toggle")
+    LogState("toggle")
+    LogDisplay("toggle")
 }
 ; Arrow key navigation
 *w:: SendModded("{Up}", ["-win"])
@@ -78,20 +78,20 @@ LogState(true)
 #XButton2:: ToggleAutoclicker()
 ; Restart script
 #^r:: {
-  WindowsKey_Mode := false
-  RestartScript()
+    WindowsKey_Mode := false
+    RestartScript()
 }
 #HotIf
 
 #HotIf !is_laptop
 ; Swap + and = keys. If + is pressed, send = and vice versa
 $*=:: {
-  if GetKeyState("Shift", "P") {
-    SendModded("{=}", ["-shift"])
-  }
-  else {
-    SendModded("{+}", ["-shift"])
-  }
+    if GetKeyState("Shift", "P") {
+        SendModded("{=}", ["-shift"])
+    }
+    else {
+        SendModded("{+}", ["-shift"])
+    }
 }
 #HotIf
 

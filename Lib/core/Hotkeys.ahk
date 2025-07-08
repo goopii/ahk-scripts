@@ -1,7 +1,9 @@
+; ============ WINDOWS ============
 ; [Alt] + F4
 ^!w:: {
     SendModded("{F4}", ["+alt", "-ctrl"])
 }
+; ============ TEXT EDITOR ============
 ; Select current line
 ^Space:: {
     Send("{Home}")
@@ -22,4 +24,11 @@
 +^x:: {
     SendModded('{Right}', ['+shift', '+ctrl'])
     SendModded('{x}', ['-shift', '+ctrl'])
+}
+; ============ NAVIGATION ============
+!a:: {
+    Send("{XButton1}")
+}
+!d:: {
+    Send("{XButton2}")
 }

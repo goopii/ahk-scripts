@@ -1,3 +1,4 @@
+#include utils/MouseOverTaskbar.ahk
 ; Middle-click on taskbar to close window
 #HotIf mouseOverTaskbar()
 MButton Up:: {
