@@ -1,4 +1,4 @@
-#Include ./RestartScript.ahk
+#Include <RestartScript>
 
 #HotIf WinActive("ahk_exe Cursor.exe")
 ~^s:: {

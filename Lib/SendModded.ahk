@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
-#include ./GetIndexOfValue.ahk
-#include ./gui/gui_log.ahk
+#include <GetIndexOfValue>
+#include <gui_log>
 ; Function to send a key with modifiers with optional forced or ignored modifiers
 ; key (required)     - The key to send
 ; options (optional) - Array of options allowing for modifiers to be forced or ignored

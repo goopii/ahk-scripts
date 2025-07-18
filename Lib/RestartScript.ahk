@@ -7,10 +7,10 @@ RestartScript() {
             Run(A_ScriptFullPath)
         else
             Run(Format('"{1}" "{2}"', A_AhkPath, A_ScriptFullPath))
-        ExitApp  ; Only exit if Run was successful
+        ExitApp
     } catch Error as e {
         MsgBox("Failed to restart script: " e.Message, "Restart Error", "Icon!")
-        return false  ; Return false to indicate restart failed
+        return false
     }
-    return true  ; Should never reach here, but good practice
+    return true
 }
