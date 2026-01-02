@@ -1,6 +1,4 @@
 #Requires AutoHotkey v2.0
-
-; Restarts script for debugging
 RestartScript() {
     try {
         if A_IsCompiled

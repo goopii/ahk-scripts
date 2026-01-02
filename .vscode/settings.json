@@ -1,8 +1,8 @@
 {
   "files.associations": {
-    "*.md": "ahk2",
+    // "*.md": "ahk2",
     "*.ahk": "ahk2"
   },
   "editor.tabSize": 2,
-  "editor.formatOnSave": true
+  "editor.formatOnSave": false
 }
