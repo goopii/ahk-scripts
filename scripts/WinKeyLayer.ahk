@@ -1,6 +1,35 @@
 #Requires AutoHotkey v2.0
 
-#Include ../utils/SetBrightness.ahk
+#include ./utils/SendModded.ahk
+#include ./utils/IsLaptop.ahk
+#include ./utils/SendCase.ahk
+
+global WinKey := false
+
+*$LWin:: {
+  global WinKey
+  WinKey := true
+  Send("{LWin DownTemp}")
+  ; Wait for key release
+  KeyWait("LWin")
+  WinKey := false
+  ; if A_TimeSinceThisHotkey < 1000 {
+  ;   Log("Fast press detected, ignoring")
+  ; }
+  ; else {
+  ;   Log("Slow press detected, releasing")
+  ;   Send("{LWin up}")
+  ; }
+  keyStateP := GetKeyState("LWin", "P")
+  keyStateT := GetKeyState("LWin", "T")
+  Log("keyStateP: " keyStateP, ThisHotkey)
+  Log("keyStateT: " keyStateT, ThisHotkey)
+  Log("------------------------------------", ThisHotkey)
+  Send("{LWin up}")
+}
+; k:: {
+;   Log("k pressed")
+; }
 
 #HotIf WinKey
 ; backtick{`} and tilde{~}

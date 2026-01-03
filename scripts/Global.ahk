@@ -1,24 +1,8 @@
 #Requires AutoHotkey v2.0
-
-; Middle-click on taskbar to close window
-#HotIf mouseOverTaskbar()
-MButton Up:: {
-  Click("Right")
-  Sleep(GetDeviceValue(250, 250))
-  Send("{Up}{Enter}")
-}
-#HotIf
-
-^MButton:: {  ; [Ctrl] + middle click
-  if not IsFullscreen() {
-    Send("{Delete}")
-  }
-}
-+MButton:: {  ; [Shift] + middle click
-  if not IsFullscreen() {
-    Send("{Enter}")
-  }
-}
+#include ./utils/IsFullscreen.ahk
+#include ./utils/SendModded.ahk
+#include ./utils/IsLaptop.ahk
+#include ./utils/MouseOverTaskbar.ahk
 
 +!a:: {
   Send("{Browser_Back}")
@@ -27,6 +11,26 @@ MButton Up:: {
   Send("{Browser_Forward}")
 }
 
+; Middle-click on taskbar to close window
+#HotIf MouseOverTaskbar()
+MButton Up:: {
+  Click("Right")
+  Sleep(GetDeviceValue(250, 250))
+  Send("{Up}{Enter}")
+}
+#HotIf
+
+#HotIf !IsFullscreen()
+^MButton:: {  ; [Ctrl] + middle click
+    Send("{Delete}")
+}
++MButton:: {  ; [Shift] + middle click
+  ; if not IsFullscreen() {
+    Send("{Enter}")
+  ; }
+}
+#HotIf
+
 ; [alt] + F4
 ^!w:: {
   SendModded("{F4}", ["+alt", "-ctrl"])
@@ -34,11 +38,11 @@ MButton Up:: {
 
 ; Send [win]+[ctrl] + F12 for Groupy2 hotkey
 !Tab:: {
-  SendModded("{F12}", ["-alt", "+win"])
+  SendModded("{F13}", ["-alt", "+win"])
 }
 ; Send [win] + F12 for Groupy2 hotkey
 #Tab:: {
-  SendModded("{F12}", ["+ctrl", "+win"])
+  SendModded("{F13}", ["+ctrl", "+win"])
 }
 
 #HotIf !is_laptop

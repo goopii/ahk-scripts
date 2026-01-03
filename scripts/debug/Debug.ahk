@@ -17,12 +17,9 @@
 ; Open ahk-scripts folder in Current Editor
 #!o:: {
   global EditorPath
-  ; Run(
-  ;   EditorPath, "C:\Users\malte\OneDrive\ahk-scripts"
-  ; )
-  ; Run(EditorPath)
-  ; Run("C:\Users\malte\AppData\Local\Programs\cursor\Cursor.exe")
-  Run("C:\Users\malte\AppData\Local\Programs\cursor\Cursor.exe", "C:\Users\malte\OneDrive\ahk-scripts")
+  Run(
+    EditorPath . " C:\Users\malte\OneDrive\ahk-scripts"
+  )
 }
 
 ; Show log window
@@ -30,5 +27,3 @@
   LogState("toggle")
   LogDisplay("toggle")
 }
-
-; HKCU\Software\Classes\AutoHotkeyScript\shell\edit\command

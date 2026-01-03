@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 
-mouseOverTaskbar() {
+MouseOverTaskbar() {
     CoordMode("Mouse", "Screen")
 
     mousePos := MouseGetPos(&mouseX, &mouseY, &mouseWin, &mouseControl)

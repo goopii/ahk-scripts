@@ -53,7 +53,7 @@ class Logger {
     }
 
     ; Public methods
-    static Log(message) {
+    static Log(message, caller := A_ThisHotkey) {
         if (!this.enabled) {
             return
         }
@@ -74,8 +74,8 @@ class Logger {
         ; Format the log message with timestamp
         timestamp := FormatTime(A_Now, "HH:mm:ss")
         ; "[" timestamp "] "
-        log_msg := "[" A_ThisHotkey "]: " message
-
+        log_msg := "[" caller "]: " message
+        
         ; Add to log entries array, maintain max size
         this.entries.Push(log_msg)
         if (this.entries.Length > this.max_lines)
@@ -141,6 +141,6 @@ class Logger {
 }
 
 ; Exported functions
-Log(message) => Logger.Log(message)
+Log(message, caller := A_ThisHotkey) => Logger.Log(message, caller)
 LogState(state := "toggle") => Logger.LogState(state)
 LogDisplay(state := "toggle") => Logger.LogDisplay(state)

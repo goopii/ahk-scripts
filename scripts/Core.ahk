@@ -4,45 +4,27 @@
 A_MenuMaskKey := "vkE8"
 ; Relaunch elevated if not running as Administrator
 if !A_IsAdmin {
-    Run '*RunAs "' A_AhkPath '" /restart "' A_ScriptFullPath '"'
-    ExitApp
+    Run('*RunAs "' A_AhkPath '" /restart "' A_ScriptFullPath '"')
+    ExitApp()
 }
 
 ;==============================================================================
 ; INCLUDES
 ;==============================================================================
-#include ../gui/gui_log.ahk
-#include ../gui/gui_toast.ahk
-#include ../utils/WindowsNotification.ahk
-#include ../utils/IsLaptop.ahk
-#include ../utils/IsFullscreen.ahk
-#include ../utils/GetActiveMonitor.ahk
-#include ../utils/MouseOverTaskbar.ahk
-#include ../utils/SendCase.ahk
-#include ../utils/SendModded.ahk
-#include ../utils/ToggleAutoclicker.ahk
-#include ../utils/GetDefaultEditor.ahk
+#include ./debug/Logger.ahk
+#include ./utils/WindowsNotification.ahk
+#include ./utils/GetDefaultEditor.ahk
 ;==============================================================================
 ; GLOBALS
 ;==============================================================================
-global WinKey := false
 global EditorPath := GetDefaultEditorPath()
 global EditorExe := GetDefaultEditorExe()
 ;==============================================================================
 ; INITIALIZATION
 ;==============================================================================
+WindowsNotification(A_ScriptName, "Script loaded")
 LogState(false)
-WindowsNotification("MasterScript", "Script loaded")
 
-*$LWin:: {
-    global WinKey
-    WinKey := true
-    Send("{LWin DownTemp}")
-    ; Wait for key release
-    KeyWait("LWin")
-    WinKey := false
-    Send("{LWin up}")
-}
 
 SetCapsLockState("AlwaysOff")
 
@@ -56,7 +38,7 @@ $*CapsLock:: {
 ; MODULES
 ;==============================================================================
 #include ./Apps.ahk
-#include ./Debug.ahk
+#include ./debug/Debug.ahk
 #include ./Games.ahk
 #include ./Global.ahk
 #include ./WinKeyLayer.ahk
