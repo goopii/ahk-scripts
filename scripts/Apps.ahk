@@ -36,8 +36,8 @@ $^Tab:: {
     SendModded("{t}", ["+ctrl"])
 }
 ; Split view
-^s:: {
-    SendModded("{n}", ["-ctrl", "+shift", "+alt"])
+!s:: {
+    SendModded("{n}", ["+shift", "+alt"])
 }
 #HotIf
 

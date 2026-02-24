@@ -35,3 +35,18 @@ WheelUp:: {
   Send("{Enter}")
 }
 #HotIf
+
+; Mewgenics
+; mewgenics_mbutton_held := false
+; #HotIf WinActive("ahk_exe Mewgenics.exe")
+; e:: {
+;   global mewgenics_mbutton_held
+;   if mewgenics_mbutton_held {
+;     Send("{MButton up}")
+;     mewgenics_mbutton_held := false
+;   } else {
+;     Send("{MButton down}")
+;     mewgenics_mbutton_held := true
+;   }
+; }
+; #HotIf

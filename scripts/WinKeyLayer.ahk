@@ -3,8 +3,11 @@
 #include ./utils/SendModded.ahk
 #include ./utils/IsLaptop.ahk
 #include ./utils/SendCase.ahk
+#include ./utils/TwinkleTrayOffset.ahk
 
 global WinKey := false
+
+
 
 *$LWin:: {
   global WinKey
@@ -13,23 +16,8 @@ global WinKey := false
   ; Wait for key release
   KeyWait("LWin")
   WinKey := false
-  ; if A_TimeSinceThisHotkey < 1000 {
-  ;   Log("Fast press detected, ignoring")
-  ; }
-  ; else {
-  ;   Log("Slow press detected, releasing")
-  ;   Send("{LWin up}")
-  ; }
-  keyStateP := GetKeyState("LWin", "P")
-  keyStateT := GetKeyState("LWin", "T")
-  Log("keyStateP: " keyStateP, ThisHotkey)
-  Log("keyStateT: " keyStateT, ThisHotkey)
-  Log("------------------------------------", ThisHotkey)
   Send("{LWin up}")
 }
-; k:: {
-;   Log("k pressed")
-; }
 
 #HotIf WinKey
 ; backtick{`} and tilde{~}
@@ -68,11 +56,21 @@ global WinKey := false
 #[:: Send("{Media_Prev}")
 
 #MButton:: Send("{Media_Play_Pause}")
-; #WheelDown:: Send("{Media_Next}")
-; #WheelUp:: Send("{Media_Prev}")
 #WheelDown:: Send("{Volume_Down}")
 #WheelUp:: Send("{Volume_Up}")
 
+#^!WheelDown:: TwinkleTrayOffset(-1)
+#^!WheelUp:: TwinkleTrayOffset(1)
+
+#^WheelDown:: Send("{Media_Next}")
+#^WheelUp:: Send("{Media_Prev}")
+
+; Win+L: Windows grabs this before AHK. Disable via registry first:
+;   HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System
+;   DWORD DisableLockWorkstation = 1
+#l:: {
+  return
+}
 
 #HotIf
 

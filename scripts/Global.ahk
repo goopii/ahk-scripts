@@ -4,6 +4,12 @@
 #include ./utils/IsLaptop.ahk
 #include ./utils/MouseOverTaskbar.ahk
 
+; [shift] + [alt] + [ctrl] + w
+; [alt] + F4
+^+!w:: {
+  SendModded("{F4}", ["+alt", "-ctrl", "-shift"])
+}
+
 +!a:: {
   Send("{Browser_Back}")
 }
@@ -31,20 +37,6 @@ MButton Up:: {
 }
 #HotIf
 
-; [alt] + F4
-^!w:: {
-  SendModded("{F4}", ["+alt", "-ctrl"])
-}
-
-; Send [win]+[ctrl] + F12 for Groupy2 hotkey
-!Tab:: {
-  SendModded("{F13}", ["-alt", "+win"])
-}
-; Send [win] + F12 for Groupy2 hotkey
-#Tab:: {
-  SendModded("{F13}", ["+ctrl", "+win"])
-}
-
 #HotIf !is_laptop
 ; Swap + and = keys. If + is pressed, send = and vice versa
 $*=:: {
@@ -55,4 +47,13 @@ $*=:: {
     SendModded("{+}", ["-shift"])
   }
 }
+
+; ; Send [win]+[ctrl] + F12 for Groupy2 hotkey
+; !Tab:: {
+;   SendModded("{F13}", ["-alt", "+win"])
+; }
+; ; Send [win] + F12 for Groupy2 hotkey
+; #Tab:: {
+;   SendModded("{F13}", ["+ctrl", "+win"])
+; }
 #HotIf
